@@ -1,0 +1,252 @@
+﻿
+<!DOCTYPE html>
+
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Snake Game</title>
+
+</head>    
+
+<body>
+    <h1>Snake Game</h1>
+    <h2>Game Mode: Easy</h2>
+    <p>Avoid the barriers and the black poison! <br />-----Press Spacebar to restart-----</p>
+    <canvas id="gameBoard" width="500" height="500"/>
+</body>
+</html>
+
+
+<style>
+   
+
+    body {
+        margin: 0px;
+        padding: 0px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background-color: darkseagreen;
+        font:20px;
+    }
+
+
+</style>
+
+
+<script>
+
+    var gameBoard = document.getElementById("gameBoard");
+    var context = gameBoard.getContext('2d');
+    //initialise context to help draw canvas and the shaps in 2d
+
+    var noBlocks = 20;
+    let blockSize = 20;
+    //divides the 400x400 canvas into 20x20 blocks, this will be used to help size the snake/food and ensure smoother movement.
+    var boolGameover = false;
+    //boolean to show game over or not
+    let score = 0;
+    var foodX;
+    var foodY;
+    //initial food x and y positions
+    var poisonX;
+    var poisonY;
+    //initial poison x and y position
+
+    var velX = 0;
+    var velY = 0;
+    //the "new" snake position (determines which way the snake moves)
+
+    var snakeX = 10;
+    var snakeY = 10;
+    //initial snake position is set at 10,10. 
+    var snakeTail = [];
+    var taillength = 1;
+    //array to store the snake parts
+
+    class snakeBody {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+        }
+
+    }
+
+    //class snakebody which has contructor x and y to help determine the parts in the array and their position.
+
+    foodpos();
+    poisonpos();
+    //function to randomise starting food and poison position
+
+    function start() {
+
+        boolGameover = gameOver();
+        if (boolGameover) {
+            return;
+        }
+        drawboard();
+        scoreBoard(); //draws the canvas and displays scoreboard
+        updatedPos();
+        checkfood();
+        checkpoison();
+        poisonspawn();
+        foodspawn();// creates the food, poison and snake while checking to see if there are any collisions
+        drawsnake();
+        setTimeout(start, 100); //recalls the start function ever 100 ms, therefore drawing the items out every time.
+
+    }
+
+    function poisonpos() {
+        poisonX = Math.floor(Math.random() * blockSize)
+        poisonY = Math.floor(Math.random() * blockSize);
+        //function to randomise poison position
+    }
+
+    function checkpoison() {
+        if (poisonX == snakeX && poisonY == snakeY) {
+            boolGameover = true;
+            alert("You have been poisoned! " + "\n" + "Your score was: " +score);
+        }
+        else if (poisonX == foodX && poisonY == foodY) {
+            poisonpos();
+        }
+    }
+    //checks to see if the poison and snake positions are the same if yes then game is over, if poison and food positions match then poison is moved
+
+    function foodpos() {
+        foodX = Math.floor(Math.random() * blockSize);
+        foodY = Math.floor(Math.random() * blockSize);
+    }
+
+    function gameOver() {
+        if (snakeX < 0 || snakeX==25 || snakeY<0 || snakeY==25) {
+            boolGameover = true;
+            alert("You have crashed! " + "\n" + "Your score was: " +score);
+        }
+        while (velX!=0 && velY!=0) {
+            if (snakeX==snakeTail) {
+                boolGameover = true;
+            }
+        }
+        return boolGameover;
+    }
+
+    //checks to see if the snake has exceeded the canvas area, if yes then returns boolean and game stops.
+
+
+    function drawboard() {
+        context.fillStyle = "cyan";
+        context.fillRect(0,0,gameBoard.clientWidth,gameBoard.clientHeight);
+    }
+    //used 2d context to draw the game canvas at positon 0,0 with a size of 500 by 500 (original length and width)
+
+    function drawsnake() {
+        context.fillStyle = "green";
+        context.fillRect(snakeX * noBlocks, snakeY * noBlocks, blockSize, blockSize);
+        //draws the snake at the randomly assigned position with a size of blocksize -20 to ensure it isnt misplaced on the canvas.
+        context.fillStyle = "yellow";
+        for (let i = 0; i < snakeTail.length; i++) {
+            let tail = snakeTail[i];
+            context.fillRect(tail.x * noBlocks, tail.y * noBlocks, blockSize, blockSize);
+
+        }
+        snakeTail.push(new snakeBody(snakeX, snakeY));
+        if (snakeTail.length > taillength) {
+            snakeTail.shift();
+        }
+        //this is the function to add to the snake. When you have eaten a food the snaketail array is incremented, this function loops through the array
+        //and in the previous snakebody class where we assigned contructors which equalled the x and y-cords here it will draw yellow rectangles at the 
+        //classes x and y co-ords, then i used the snaketail.push array to add items where the snake position was
+        //then we use .shift function to remove the item which is furthest from the snake head in the array
+        //this is because initially the snake has 1 tail but you haven't done anything, therefore there is an extra item in the array which is greater than the tail length and has to be removed
+    }
+
+    function scoreBoard() {
+        context.fillStyle = "purple";
+        context.font = "15px fantasy";
+        context.fillText("Your Score is: " +score, 10,20);
+    }
+    //displays scoreboard at the top left.
+
+
+    function updatedPos() {
+        snakeX = snakeX + velX;
+        snakeY = snakeY + velY;
+        return;
+        }
+    //is the newest snake position based on which movement key was pressed and thus which velocity co-ordinate was incremented
+
+    function checkfood() {
+        if (foodX == snakeX && foodY == snakeY) {
+            score += 1;
+            taillength++;
+            foodpos();
+            return score;
+        }
+    }
+    //checks to see if snake and food position match, if yes it increments score and array and spawns a new food randomly on the board.
+
+
+    function poisonspawn() {
+        context.fillStyle = "black";
+        context.fillRect(poisonX*noBlocks,poisonY*noBlocks,blockSize,blockSize);
+    }
+
+
+    function foodspawn() {
+        context.fillStyle = "red";
+        context.fillRect(foodX*noBlocks,foodY*noBlocks,blockSize,blockSize);
+    }
+
+    //document event listener which looks for any key presses, when done it calls the function keyD
+
+    document.addEventListener('keydown', keyD);
+    function keyD(event) {
+        if (event.keyCode == 38) {
+            if (velY == 1) {   // checks to see if already moving down, if yes it cannot move up suddenly.
+                return;// keycode 38= up arrow
+            }
+            velY = -1;
+            velX = 0;
+        }
+        else if (event.keyCode == 39) {
+            if (velX == -1) { //checks to see if currently moving in opposite direction- i.e left- if yes then it cannot move right suddenly.
+                return;
+            }   //code 39=right arrow
+            velY = 0;
+            velX = 1;
+        }
+        else if (event.keyCode == 40) {
+            if (velY == - 1) { //checks to see if moving up, if so it cannot suddenly move down.
+                return;
+            } //code 40=down arrow
+            velY = 1;
+            velX = 0;
+        }
+        else if (event.keyCode == 37) {
+            if (velX == 1) {
+                return;
+            } //code 37=left arrow
+            velX = -1;
+            velY = 0;
+        }
+        else if (event.keyCode ==32) {
+            reloadpage();  //32= space bar which resets the game
+        }
+    }
+
+    function reloadpage() {
+        if (confirm("Would you like to play again? "))
+            location.reload();
+    }
+
+
+
+
+    start();
+
+
+</script>
+

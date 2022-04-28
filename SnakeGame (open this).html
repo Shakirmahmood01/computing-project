@@ -1,0 +1,96 @@
+﻿<!DOCTYPE html>
+
+<style>
+    
+    .split {
+        height: 100%;
+        width: 50%;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        overflow-x: hidden;
+        padding-top: 20px;
+    }
+
+    .left {
+        left:0;
+        background-color:forestgreen;
+
+    }
+    .right {
+        right:0;
+        background-color:firebrick;
+    }
+    .centered {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+    button{
+
+        display:inline-block;
+        width:250px;
+        height:100px;
+        border-radius:10px;
+        border: 1px solid black;
+        text-align:center;
+        font-size:25px;
+        font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        cursor:pointer;
+        margin:2px;
+        background-color:yellowgreen;
+        
+
+    }
+    button:hover{
+        background-color:aliceblue;
+
+    }
+    .button{        
+        background-color:lightcoral;
+    }
+
+ 
+
+</style>
+
+<script>
+    
+    function regMode() {
+        window.location.href="regulargamemode.html";
+
+    }
+
+    function hardMode() {
+        window.location.href = "hardgamemode.html";
+
+    }
+
+</script>
+
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <div class="split left">
+        <div class="centered">           
+            <button onclick="regMode()">Easy Game Mode</button>
+            <p id="regularGameMode"></p>
+        </div>
+    </div>
+
+    <div class="split right">
+        <div class="centered">
+            <button onclick="hardMode()" class="button">Hard Game Mode</button>
+            <p id="hardGameMode"></p>
+        </div>
+
+    </div>
+
+</body>
+</html>
